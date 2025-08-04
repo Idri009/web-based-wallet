@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "pnpm build:main && pnpm build:inject",
+    "build:main": "vite build --config vite.config.ts",
+    "build:inject": "vite build --config vite.config.inject.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },

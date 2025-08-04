@@ -37,7 +37,7 @@ interface WalletEventMessage {
 
     // Inject the provider script into the page
     const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('inject.js');
+    script.src = chrome.runtime.getURL('inject/inject.js');
 
     script.onload = function () {
         console.log('✅ inject.js loaded successfully');

@@ -42,7 +42,7 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "inject.js"
+                "inject/inject.js"
             ],
             "matches": [
                 "<all_urls>"

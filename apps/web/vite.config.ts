@@ -15,15 +15,11 @@ export default defineConfig({
                 popup: resolve(__dirname, "index.html"),
                 background: resolve(__dirname, "src/background/background.ts"),
                 "content-script": resolve(__dirname, "src/utils/content-script.ts"),
-                "inject": resolve(__dirname, "src/inject/inject.ts"),
             },
             output: {
-                entryFileNames: (chunkInfo) => {
-                    if(chunkInfo.name === "inject") {
-                        return `[name].js`;
-                    }
+                entryFileNames: () => {
                     return `[name].js`;
-                }
+                },
             }
         },
         outDir: "dist",
