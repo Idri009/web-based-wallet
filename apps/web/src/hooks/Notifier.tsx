@@ -1,6 +1,5 @@
 import { usePopUp } from "../context/PopUpPanelContext";
 
-
 export function useNotifier() {
   const { showPanel } = usePopUp();
 

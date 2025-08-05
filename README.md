@@ -1,6 +1,3 @@
-
-
-
 ## Contributors
 
 <a href="https://github.com/Anjansuman/web-based-wallet/graphs/contributors">

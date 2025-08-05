@@ -1,18 +1,23 @@
-import { IconBrandTelegram, IconHistoryToggle, IconHome, IconQrcode, IconTransfer } from "@tabler/icons-react";
-
+import {
+  IconBrandTelegram,
+  IconHistoryToggle,
+  IconHome,
+  IconQrcode,
+  IconTransfer,
+} from "@tabler/icons-react";
 
 export default function BottomBar() {
-    return <div className="w-full fixed bottom-0 left-0 p-3 flex justify-center items-center z-20 ">
-        <div
-            className="w-full p-4 rounded-xl bg-[#1e1e1e] text-white text-base font-semibold flex justify-around items-center border border-neutral-600 shadow-md "
-        >
-            <IconHome className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
-            <IconTransfer className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
-            <IconHistoryToggle className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
-            <IconBrandTelegram className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
-            <IconQrcode className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
-        </div>
+  return (
+    <div className="w-full fixed bottom-0 left-0 p-3 flex justify-center items-center z-20 ">
+      <div className="w-full p-4 rounded-xl bg-[#1e1e1e] text-white text-base font-semibold flex justify-around items-center border border-neutral-600 shadow-md ">
+        <IconHome className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
+        <IconTransfer className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
+        <IconHistoryToggle className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
+        <IconBrandTelegram className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
+        <IconQrcode className="hover:text-[#ff4d67] transition-colors cursor-pointer " />
+      </div>
     </div>
+  );
 }
 
 /*

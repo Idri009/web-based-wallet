@@ -1,6 +1,4 @@
-
-
 export interface NetworkType {
-    name: string,
-    RPC: string
+  name: string;
+  RPC: string;
 }

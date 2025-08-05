@@ -1,153 +1,167 @@
-
 import { useEffect, useRef, useState } from "react";
-import { useHashedStore } from '../../../../store/hashed-store';
-import Button from '../../../../components/ui/Button';
-import gsap from 'gsap';
-import { IconBracketsContain, IconDownload, IconEye, IconNotebook, IconPlus } from "@tabler/icons-react";
+import { useHashedStore } from "../../../../store/hashed-store";
+import Button from "../../../../components/ui/Button";
+import gsap from "gsap";
+import {
+  IconBracketsContain,
+  IconDownload,
+  IconEye,
+  IconNotebook,
+  IconPlus,
+} from "@tabler/icons-react";
 import { GrayButton } from "../../../../components/ui/GrayButton";
 import { AddNewAccount } from "./AddNewAccount";
 import { SavedAddresses } from "./SavedAddresses";
 import { GeneralisedAddExistedAccount } from "./GeneralisedAddExistedAccount";
 
-
 interface ReceiveProps {
-    close: () => void,
-
+  close: () => void;
 }
 
 export const AddAccount = ({ close }: ReceiveProps) => {
+  const { hashed } = useHashedStore();
+  const panelRef = useRef<HTMLDivElement>(null);
 
-    const { hashed } = useHashedStore();
-    const panelRef = useRef<HTMLDivElement>(null);
+  const [newAccountPanel, setNewAccountPanel] = useState<
+    | "newAccount"
+    | "newRecoveryPhrase"
+    | "importAccount"
+    | "watchAddress"
+    | "savedAddresses"
+    | null
+  >(null);
 
+  useEffect(() => {
+    if (!panelRef.current) return;
 
-    const [newAccountPanel, setNewAccountPanel] = useState<"newAccount" | "newRecoveryPhrase" | "importAccount" | "watchAddress" | "savedAddresses" | null>(null);
+    gsap.from(panelRef.current, {
+      y: 530,
+      duration: 0.4,
+      ease: "power2.inOut",
+    });
+  }, []);
 
-    useEffect(() => {
+  const onClose = () => {
+    if (!panelRef.current) return;
 
-        if (!panelRef.current) return;
+    gsap.to(panelRef.current, {
+      y: 530,
+      duration: 0.4,
+      ease: "power2.inOut",
+      onComplete: () => {
+        close();
+      },
+    });
+  };
 
-        gsap.from(panelRef.current, {
-            y: 530,
-            duration: 0.4,
-            ease: "power2.inOut"
-        });
+  useEffect(() => {
+    if (!hashed) return;
+  }, [hashed]);
 
-    }, []);
+  const handleAddAccountRequest = (index: number) => {
+    if (index === 0) setNewAccountPanel("newAccount");
+    else if (index === 1) setNewAccountPanel("newRecoveryPhrase");
+    else if (index === 2) setNewAccountPanel("importAccount");
+    else if (index === 3) setNewAccountPanel("watchAddress");
+    else if (index === 4) setNewAccountPanel("savedAddresses");
+  };
 
-    const onClose = () => {
-        if (!panelRef.current) return;
-
-        gsap.to(panelRef.current, {
-            y: 530,
-            duration: 0.4,
-            ease: "power2.inOut",
-            onComplete: () => {
-                close()
-            }
-        });
-    }
-
-    useEffect(() => {
-        if (!hashed) return;
-
-
-    }, [hashed]);
-
-    const handleAddAccountRequest = (index: number) => {
-        if (index === 0) setNewAccountPanel("newAccount");
-        else if (index === 1) setNewAccountPanel("newRecoveryPhrase");
-        else if (index === 2) setNewAccountPanel("importAccount");
-        else if (index === 3) setNewAccountPanel("watchAddress");
-        else if (index === 4) setNewAccountPanel("savedAddresses");
-    }
-
-    return <div className="h-full w-full absolute z-50 top-[0] left-0 flex justify-start items-start ">
-        <div
-            className="w-full h-[600px] bg-neutral-900 flex flex-col justify-between items-center p-3 "
-            ref={panelRef}
-        >
-            <div className="w-full flex justify-center items-center p-3 shadow-md text-base font-semibold ">
-                Add a new wallet
-            </div>
-
-            <div className="w-full h-full overflow-x-hidden overflow-y-auto [::-webkit-scrollbar]:hidden [scrollbar-width:none] ">
-
-                <div className="w-full h-full flex flex-col justify-start items-center pt-2 gap-y-2">
-                    {contentArray()?.map((detail, index) => (
-                        <GrayButton
-                            className={"flex justify-start items-center gap-x-3 "}
-                            key={index}
-                            onClick={() => handleAddAccountRequest(index)}
-                        >
-                            <div className="rounded-full p-2 bg-[#2e2e2e] ">
-                                {detail.logo}
-                            </div>
-                            <div className="flex flex-col items-start justify-between ">
-                                <div className="">
-                                    {detail.title}
-                                </div>
-                                <div className="text-xs font-normal text-neutral-400 ">
-                                    {detail.description}
-                                </div>
-                            </div>
-                        </GrayButton>
-                    ))}
-                </div>
-            </div>
-
-            <div className="w-full p-2 ">
-                <Button
-                    content={"Close"}
-                    onClick={onClose}
-                />
-            </div>
+  return (
+    <div className="h-full w-full absolute z-50 top-[0] left-0 flex justify-start items-start ">
+      <div
+        className="w-full h-[600px] bg-neutral-900 flex flex-col justify-between items-center p-3 "
+        ref={panelRef}
+      >
+        <div className="w-full flex justify-center items-center p-3 shadow-md text-base font-semibold ">
+          Add a new wallet
         </div>
-        
-        {newAccountPanel === "newAccount" && <AddNewAccount close={() => setNewAccountPanel(null)} />}
-        {newAccountPanel === "newRecoveryPhrase" && <AddNewAccount close={() => setNewAccountPanel(null)} />}
-        {newAccountPanel === "importAccount" && <GeneralisedAddExistedAccount type={"import"} close={() => setNewAccountPanel(null)} />}
-        {newAccountPanel === "watchAddress" && <GeneralisedAddExistedAccount type={"watch"} close={() => setNewAccountPanel(null)} />}
-        {newAccountPanel === "savedAddresses" && <SavedAddresses close={() => setNewAccountPanel(null)} />}
-        
-    </div>
-}
 
+        <div className="w-full h-full overflow-x-hidden overflow-y-auto [::-webkit-scrollbar]:hidden [scrollbar-width:none] ">
+          <div className="w-full h-full flex flex-col justify-start items-center pt-2 gap-y-2">
+            {contentArray()?.map((detail, index) => (
+              <GrayButton
+                className={"flex justify-start items-center gap-x-3 "}
+                key={index}
+                onClick={() => handleAddAccountRequest(index)}
+              >
+                <div className="rounded-full p-2 bg-[#2e2e2e] ">
+                  {detail.logo}
+                </div>
+                <div className="flex flex-col items-start justify-between ">
+                  <div className="">{detail.title}</div>
+                  <div className="text-xs font-normal text-neutral-400 ">
+                    {detail.description}
+                  </div>
+                </div>
+              </GrayButton>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-full p-2 ">
+          <Button content={"Close"} onClick={onClose} />
+        </div>
+      </div>
+
+      {newAccountPanel === "newAccount" && (
+        <AddNewAccount close={() => setNewAccountPanel(null)} />
+      )}
+      {newAccountPanel === "newRecoveryPhrase" && (
+        <AddNewAccount close={() => setNewAccountPanel(null)} />
+      )}
+      {newAccountPanel === "importAccount" && (
+        <GeneralisedAddExistedAccount
+          type={"import"}
+          close={() => setNewAccountPanel(null)}
+        />
+      )}
+      {newAccountPanel === "watchAddress" && (
+        <GeneralisedAddExistedAccount
+          type={"watch"}
+          close={() => setNewAccountPanel(null)}
+        />
+      )}
+      {newAccountPanel === "savedAddresses" && (
+        <SavedAddresses close={() => setNewAccountPanel(null)} />
+      )}
+    </div>
+  );
+};
 
 interface contentType {
-    logo: React.ReactNode,
-    title: string,
-    description: string
+  logo: React.ReactNode;
+  title: string;
+  description: string;
 }
 
 export const contentArray = () => {
-    const content: contentType[] = [
-        {
-            logo: <IconPlus />,
-            title: "Create New Account",
-            description: "Add a new account"
-        },
-        {
-            logo: <IconBracketsContain />,
-            title: "Import Recovery Phrase",
-            description: "Import accounts from that phrase"
-        },
-        {
-            logo: <IconDownload />,
-            title: "Import Private Key",
-            description: "Import a account using it's private key"
-        },
-        {
-            logo: <IconEye />,
-            title: "Watch Address",
-            description: "Track any public wallet address"
-        },
-        {
-            logo: <IconNotebook />,
-            title: "Saved Addresses",
-            description: "All of your saved addresses"
-        }
-    ];
+  const content: contentType[] = [
+    {
+      logo: <IconPlus />,
+      title: "Create New Account",
+      description: "Add a new account",
+    },
+    {
+      logo: <IconBracketsContain />,
+      title: "Import Recovery Phrase",
+      description: "Import accounts from that phrase",
+    },
+    {
+      logo: <IconDownload />,
+      title: "Import Private Key",
+      description: "Import a account using it's private key",
+    },
+    {
+      logo: <IconEye />,
+      title: "Watch Address",
+      description: "Track any public wallet address",
+    },
+    {
+      logo: <IconNotebook />,
+      title: "Saved Addresses",
+      description: "All of your saved addresses",
+    },
+  ];
 
-    return content;
-}
+  return content;
+};

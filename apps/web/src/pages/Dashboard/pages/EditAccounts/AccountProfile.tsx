@@ -1,246 +1,227 @@
-
 import { useEffect, useRef, useState } from "react";
-import { useHashedStore } from '../../../../store/hashed-store';
-import Button from '../../../../components/ui/Button';
-import gsap from 'gsap';
+import { useHashedStore } from "../../../../store/hashed-store";
+import Button from "../../../../components/ui/Button";
+import gsap from "gsap";
 import type { Account } from "../../../../types/AccountType";
 import { GrayButton } from "../../../../components/ui/GrayButton";
 import { IconChevronCompactRight, IconPencil } from "@tabler/icons-react";
 import { Receive } from "../Receive";
 import { PassCheck } from "../PassCheck/PassCheck";
 
-
 interface ReceiveProps {
-    close: () => void,
-    data: Account
+  close: () => void;
+  data: Account;
 }
 
 export const AccountProfile = ({ close, data }: ReceiveProps) => {
+  const { hashed } = useHashedStore();
+  const panelRef = useRef<HTMLDivElement>(null);
 
-    const { hashed } = useHashedStore();
-    const panelRef = useRef<HTMLDivElement>(null);
+  const [infoPanel, setInfoPanel] = useState<string | null>(null);
+  const [privakeKeyPanel, setPrivateKeyPanel] = useState<boolean>(false);
+  const [seedPhrasePanel, setSeedPhrasePanel] = useState<boolean>(false);
 
-    const [infoPanel, setInfoPanel] = useState<string | null>(null);
-    const [privakeKeyPanel, setPrivateKeyPanel] = useState<boolean>(false);
-    const [seedPhrasePanel, setSeedPhrasePanel] = useState<boolean>(false);
+  const [mnemonic, setMnemonic] = useState<string>("");
+  const [numOfAccounts, setNumOfAccounts] = useState<number>(0);
 
-    const [mnemonic, setMnemonic] = useState<string>("");
-    const [numOfAccounts, setNumOfAccounts] = useState<number>(0);
+  const [passwordPanel, setPasswordPanel] = useState<
+    "privateKey" | "seedPhrase" | null
+  >(null);
 
-    const [passwordPanel, setPasswordPanel] = useState<"privateKey" | "seedPhrase" | null>(null);
+  useEffect(() => {
+    if (!panelRef.current) return;
 
-    useEffect(() => {
+    gsap.from(panelRef.current, {
+      x: 360,
+      duration: 0.4,
+      ease: "power2.inOut",
+    });
+  }, []);
 
-        if (!panelRef.current) return;
+  const onClose = () => {
+    if (!panelRef.current) return;
 
-        gsap.from(panelRef.current, {
-            x: 360,
-            duration: 0.4,
-            ease: "power2.inOut"
-        });
+    gsap.to(panelRef.current, {
+      x: 360,
+      duration: 0.4,
+      ease: "power2.inOut",
+      onComplete: () => {
+        close();
+      },
+    });
+  };
 
-    }, []);
+  const handleDeleteAccount = () => {
+    if (!hashed) return;
 
-    const onClose = () => {
-        if (!panelRef.current) return;
+    const done = hashed.deleteAccount(data.name, data.publicKey);
 
-        gsap.to(panelRef.current, {
-            x: 360,
-            duration: 0.4,
-            ease: "power2.inOut",
-            onComplete: () => {
-                close()
-            }
-        });
+    if (done) {
+      onClose();
+    } else {
+      // handle the false statement
     }
+  };
 
-    const handleDeleteAccount = () => {
-        if (!hashed) return;
+  const handlePasswordPanel = (index: number) => {
+    if (index === 0) setPasswordPanel("privateKey");
+    else if (index === 1) setPasswordPanel("seedPhrase");
+  };
 
-        const done = hashed.deleteAccount(data.name, data.publicKey);
-
-        if (done) {
-            onClose();
-        } else {
-            // handle the false statement
-        }
-
+  const handlePasswordResult = (
+    isDone: boolean,
+    type: "privateKey" | "seedPhrase" | "passwordChange",
+  ) => {
+    if (isDone && type === "privateKey") {
+      setPrivateKeyPanel(true);
+    } else if (isDone && type === "seedPhrase") {
+      setSeedPhrasePanel(true);
     }
+  };
 
-    const handlePasswordPanel = (index: number) => {
+  useEffect(() => {
+    if (!hashed) return;
 
-        if (index === 0) setPasswordPanel("privateKey");
-        else if (index === 1) setPasswordPanel("seedPhrase");
+    const m = hashed.getMnemonic();
+    const totalAccounts = hashed.getAccounts().length;
 
-    }
+    setNumOfAccounts(totalAccounts);
+    setMnemonic(m);
+  }, [hashed]);
 
-    const handlePasswordResult = (isDone: boolean, type: "privateKey" | "seedPhrase" | "passwordChange") => {
-        if(isDone && type === "privateKey") {
-            setPrivateKeyPanel(true);
-        } else if(isDone && type === "seedPhrase") {
-            setSeedPhrasePanel(true);
-        }
-    }
-
-    useEffect(() => {
-        if (!hashed) return;
-
-        const m = hashed.getMnemonic();
-        const totalAccounts = hashed.getAccounts().length;
-
-        setNumOfAccounts(totalAccounts);
-        setMnemonic(m);
-    }, [hashed]);
-
-    return <div className="h-full w-full absolute z-50 top-[0] left-0 flex justify-start items-start ">
-        <div
-            className="w-full h-[600px] bg-neutral-900 flex flex-col justify-between items-center p-3 "
-            ref={panelRef}
-        >
-            <div className="w-full flex justify-center items-center p-3 shadow-md text-base font-semibold ">
-                Account details
-            </div>
-
-            <div className="w-full h-full pt-4 flex flex-col justify-start items-center gap-y-4 overflow-x-hidden overflow-y-auto [::-webkit-scrollbar]:hidden [scrollbar-width:none] ">
-
-                <div className="h-20 w-20 relative bg-[#1e1e1e] rounded-full border border-neutral-600 flex justify-center items-center text-center text-lg ">
-                    {data.name.charAt(0)}
-                    {/* edit icon */}
-                    <div
-                        className="absolute group z-10 bottom-0.5 right-0.5 p-0.5 border border-neutral-600 bg-[#1e1e1e] hover:bg-[#ff4d67] transition-colors rounded-full flex justify-center items-center cursor-pointer "
-                        onClick={() => { }}
-                    >
-                        <IconPencil className="size-4 fill-[#1e1e1e] stroke-neutral-600 group-hover:fill-white group-hover:stroke-black stroke-1 transition-colors " />
-                    </div>
-                </div>
-
-                {/* These options will be directly accessed by unlocked wallet */}
-                <div className="w-full flex flex-col gap-y-0.5 rounded-xl overflow-hidden ">
-                    {
-                        contentArray(data, mnemonic).noPassContent.map((content, index) => (
-                            <GrayButton
-                                key={index}
-                                className="group"
-                                plain
-                                onClick={() => setInfoPanel(content.valueToLaterShow!)}
-                            >
-                                <div>
-                                    {content.label}
-                                </div>
-                                <div className="flex items-center justify-between gap-x-2 ">
-                                    <div className="text-neutral-600 ">
-                                        {content.valueToShow}
-                                    </div>
-                                    <IconChevronCompactRight className="text-neutral-600 group-hover:text-white transition-colors " />
-                                </div>
-                            </GrayButton>
-                        ))
-                    }
-                </div>
-                {/* These options will require password to view */}
-                <div className="w-full flex flex-col gap-y-0.5 rounded-xl overflow-hidden ">
-                    {
-                        contentArray(data, mnemonic).passContent.map((content, index) => (
-                            <GrayButton
-                                key={index}
-                                className="group"
-                                plain
-                                onClick={() => handlePasswordPanel(index)}
-                            >
-                                <div>
-                                    {content.label}
-                                </div>
-                                <div className="flex items-center justify-between gap-x-2 ">
-                                    <div className="text-neutral-600 ">
-                                        {content.valueToShow}
-                                    </div>
-                                    <IconChevronCompactRight className="text-neutral-600 group-hover:text-white transition-colors " />
-                                </div>
-                            </GrayButton>
-                        ))
-                    }
-                </div>
-
-                {
-                    numOfAccounts > 1
-                        ?
-                        <GrayButton onClick={handleDeleteAccount}>
-                            <div className="w-full text-red-500 flex justify-center ">
-                                Remove Account
-                            </div>
-                        </GrayButton>
-                        :
-                        ""
-                }
-
-            </div>
-
-            <div className="w-full p-2 flex justify-center items-center gap-x-2 ">
-                <Button
-                    content={"Close"}
-                    onClick={onClose}
-                />
-            </div>
+  return (
+    <div className="h-full w-full absolute z-50 top-[0] left-0 flex justify-start items-start ">
+      <div
+        className="w-full h-[600px] bg-neutral-900 flex flex-col justify-between items-center p-3 "
+        ref={panelRef}
+      >
+        <div className="w-full flex justify-center items-center p-3 shadow-md text-base font-semibold ">
+          Account details
         </div>
 
-        {infoPanel && <Receive close={() => setInfoPanel(null)} publicKey={infoPanel} />}
+        <div className="w-full h-full pt-4 flex flex-col justify-start items-center gap-y-4 overflow-x-hidden overflow-y-auto [::-webkit-scrollbar]:hidden [scrollbar-width:none] ">
+          <div className="h-20 w-20 relative bg-[#1e1e1e] rounded-full border border-neutral-600 flex justify-center items-center text-center text-lg ">
+            {data.name.charAt(0)}
+            {/* edit icon */}
+            <div
+              className="absolute group z-10 bottom-0.5 right-0.5 p-0.5 border border-neutral-600 bg-[#1e1e1e] hover:bg-[#ff4d67] transition-colors rounded-full flex justify-center items-center cursor-pointer "
+              onClick={() => {}}
+            >
+              <IconPencil className="size-4 fill-[#1e1e1e] stroke-neutral-600 group-hover:fill-white group-hover:stroke-black stroke-1 transition-colors " />
+            </div>
+          </div>
 
-        {passwordPanel && <PassCheck
-            type={passwordPanel}
-            close={() => setPasswordPanel(null)}
-            done={handlePasswordResult}
-        />}
+          {/* These options will be directly accessed by unlocked wallet */}
+          <div className="w-full flex flex-col gap-y-0.5 rounded-xl overflow-hidden ">
+            {contentArray(data, mnemonic).noPassContent.map(
+              (content, index) => (
+                <GrayButton
+                  key={index}
+                  className="group"
+                  plain
+                  onClick={() => setInfoPanel(content.valueToLaterShow!)}
+                >
+                  <div>{content.label}</div>
+                  <div className="flex items-center justify-between gap-x-2 ">
+                    <div className="text-neutral-600 ">
+                      {content.valueToShow}
+                    </div>
+                    <IconChevronCompactRight className="text-neutral-600 group-hover:text-white transition-colors " />
+                  </div>
+                </GrayButton>
+              ),
+            )}
+          </div>
+          {/* These options will require password to view */}
+          <div className="w-full flex flex-col gap-y-0.5 rounded-xl overflow-hidden ">
+            {contentArray(data, mnemonic).passContent.map((content, index) => (
+              <GrayButton
+                key={index}
+                className="group"
+                plain
+                onClick={() => handlePasswordPanel(index)}
+              >
+                <div>{content.label}</div>
+                <div className="flex items-center justify-between gap-x-2 ">
+                  <div className="text-neutral-600 ">{content.valueToShow}</div>
+                  <IconChevronCompactRight className="text-neutral-600 group-hover:text-white transition-colors " />
+                </div>
+              </GrayButton>
+            ))}
+          </div>
 
-        {privakeKeyPanel && <Receive close={() => setPrivateKeyPanel(false)} />}
-        {seedPhrasePanel && <Receive close={() => setSeedPhrasePanel(false)} />}
+          {numOfAccounts > 1 ? (
+            <GrayButton onClick={handleDeleteAccount}>
+              <div className="w-full text-red-500 flex justify-center ">
+                Remove Account
+              </div>
+            </GrayButton>
+          ) : (
+            ""
+          )}
+        </div>
 
+        <div className="w-full p-2 flex justify-center items-center gap-x-2 ">
+          <Button content={"Close"} onClick={onClose} />
+        </div>
+      </div>
+
+      {infoPanel && (
+        <Receive close={() => setInfoPanel(null)} publicKey={infoPanel} />
+      )}
+
+      {passwordPanel && (
+        <PassCheck
+          type={passwordPanel}
+          close={() => setPasswordPanel(null)}
+          done={handlePasswordResult}
+        />
+      )}
+
+      {privakeKeyPanel && <Receive close={() => setPrivateKeyPanel(false)} />}
+      {seedPhrasePanel && <Receive close={() => setSeedPhrasePanel(false)} />}
     </div>
-}
+  );
+};
 
 interface contentType {
-    label: string,
-    valueToShow?: string,
-    valueToLaterShow?: string
+  label: string;
+  valueToShow?: string;
+  valueToLaterShow?: string;
 }
 
-export const contentArray = (
-    data: Account,
-    mnemonic: string
-) => {
+export const contentArray = (data: Account, mnemonic: string) => {
+  let noPassContent: contentType[] = [
+    {
+      label: "Account Name",
+      valueToShow: data.name,
+    },
+    {
+      label: "Account Address",
+      valueToLaterShow: data.publicKey,
+    },
+  ];
 
-    let noPassContent: contentType[] = [
-        {
-            label: "Account Name",
-            valueToShow: data.name
-        },
-        {
-            label: "Account Address",
-            valueToLaterShow: data.publicKey
-        }
-    ];
+  let passContent: contentType[] = [];
 
-    let passContent: contentType[] = [];
+  if (data.derivedAccountNum === -1) {
+    passContent.push({
+      label: "Show Private Key",
+      valueToLaterShow: data.privateKey,
+    });
+  } else if (data.derivedAccountNum >= 0) {
+    passContent.push({
+      label: "Show Private Key",
+      valueToLaterShow: data.privateKey,
+    });
+    passContent.push({
+      label: "Show Seed Phrase",
+      valueToLaterShow: mnemonic,
+    });
+  }
 
-    if (data.derivedAccountNum === -1) {
-        passContent.push({
-            label: "Show Private Key",
-            valueToLaterShow: data.privateKey
-        });
-    } else if (data.derivedAccountNum >= 0) {
-        passContent.push({
-            label: "Show Private Key",
-            valueToLaterShow: data.privateKey
-        });
-        passContent.push({
-            label: "Show Seed Phrase",
-            valueToLaterShow: mnemonic
-        });
-
-    }
-
-    return {
-        noPassContent,
-        passContent
-    };
-
-}
+  return {
+    noPassContent,
+    passContent,
+  };
+};

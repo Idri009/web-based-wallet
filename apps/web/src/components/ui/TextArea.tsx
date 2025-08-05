@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
 
 interface InputProps {
-  className?: string,
-  type?: "text" | "password",
-  placeholder: string,
-  error?: boolean,
-  ref?: React.Ref<HTMLTextAreaElement>
-  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void,
-  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void,
-  value?: string
+  className?: string;
+  type?: "text" | "password";
+  placeholder: string;
+  error?: boolean;
+  ref?: React.Ref<HTMLTextAreaElement>;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  value?: string;
 }
 
 export const TextArea = ({
@@ -19,9 +19,8 @@ export const TextArea = ({
   ref,
   onChange,
   onKeyDown,
-  value
+  value,
 }: InputProps) => {
-
   const [maskedValue, setMaskedValue] = useState("");
   const actualValue = useRef("");
 
