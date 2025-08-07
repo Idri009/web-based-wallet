@@ -3,14 +3,8 @@
 import { hashedInfo } from "./hashed-info";
 import { EthereumProviderImpl } from "./inject-abstraction";
 
-// import type { WalletRequest } from "../types/inject-type";
 
-// import { EthereumProviderImpl } from "./inject-abstraction";
-// import { hashedInfo } from "./hashed-info";
 
-console.log("Inject script starting...");
-
-// Implementation
 (function () {
   // Create and inject the provider
   const provider = new EthereumProviderImpl();
