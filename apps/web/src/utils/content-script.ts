@@ -1,133 +1,37 @@
-// content-script.ts - Content script with debugging
-
 import { WALLET_EVENT } from "../enums/inject-wallet-event-enum";
 
+console.log("[CONTENT] script loaded");
 
-// Message types for communication
-interface WalletRequestMessage {
-    type: WALLET_EVENT.WALLET_REQUEST;
-    method: string;
-    params: any[];
-    id: number;
-}
+// Dynamically inject inject.js into page
+const script = document.createElement("script");
+script.src = chrome.runtime.getURL("inject/inject.js");
+script.onload = function () {
+    (this as HTMLScriptElement).remove();
+};
+(document.head || document.documentElement).appendChild(script);
 
-interface WalletResponseMessage {
-    type: WALLET_EVENT.WALLET_RESPONSE;
-    id: number;
-    result?: any;
-    error?: string;
-}
+// Listen for messages from inject.js
+window.addEventListener("message", async (event) => {
+    if (event.source !== window) return;
+    if (!event.data || !event.data.type) return;
 
-interface WalletEventMessage {
-    type:
-    | WALLET_EVENT.WALLET_UNLOCKED
-    | WALLET_EVENT.WALLET_LOCKED
-    | WALLET_EVENT.CHAIN_CHANGED
-    | WALLET_EVENT.ACCOUNTS_CHANGED;
-    [key: string]: any;
-}
+    if (event.data.type === WALLET_EVENT.WALLET_REQUEST) {
+        console.log("[CONTENT] Received WALLET_REQUEST from inject", event.data);
 
-(function () {
-
-    // Check if chrome.runtime is available
-    if (!chrome || !chrome.runtime) {
-        console.error("Chrome runtime not available!");
-        return;
+        chrome.runtime.sendMessage(
+            {
+                type: WALLET_EVENT.WALLET_REQUEST,
+                method: event.data.method,
+                params: event.data.params,
+                id: event.data.id
+            },
+            (res) => {
+                console.log("[CONTENT] Got response from background:", res);
+                window.postMessage(
+                    { type: WALLET_EVENT.WALLET_RESPONSE, ...res },
+                    "*"
+                );
+            }
+        );
     }
-
-
-    // Inject the provider script into the page
-    const script = document.createElement("script");
-    script.src = chrome.runtime.getURL("inject/inject.js");
-
-    script.onload = function () {
-        // Use parentNode.removeChild for better compatibility
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
-        }
-    };
-
-    script.onerror = function (error) {
-        console.error("Failed to load Hashed wallet: ", error);
-    };
-
-    (document.head || document.documentElement).appendChild(script);
-
-    // Listen for messages from injected script
-    window.addEventListener("message", async (event: MessageEvent) => {
-
-        console.log('inject -> content-script: 1');
-        console.log("event is: ", event);
-
-        if (event.source !== window as Window || !event.data?.type) return;
-
-        console.log('inject -> content-script: 2');
-
-        if (event.data.type === WALLET_EVENT.WALLET_REQUEST) {
-            console.log('inject -> content-script: 3');
-            const requestData = event.data as WalletRequestMessage;
-
-            try {
-
-                console.log("[CONTENT] Received WALLET_REQUEST from inject", requestData);
-                // Forward to background script
-                try {
-                    const response = await chrome.runtime.sendMessage({
-                        type: WALLET_EVENT.WALLET_REQUEST,
-                        method: requestData.method,
-                        params: requestData.params,
-                        id: requestData.id,
-                    });
-
-                    console.log("[CONTENT] Got response from background", response);
-
-                    // Send response back to page
-                    const responseMessage: WalletResponseMessage = {
-                        type: WALLET_EVENT.WALLET_RESPONSE,
-                        id: requestData.id,
-                        result: response.result,
-                        error: response.error,
-                    };
-
-                    window.postMessage(responseMessage, "*");
-                } catch (err) {
-                    console.error("[CONTENT] Error sending to background", err);
-                }
-            } catch (error) {
-                console.error("❌ Content script error:", error);
-                // Handle chrome.runtime errors (extension context invalidated, etc.)
-                const errorMessage: WalletResponseMessage = {
-                    type: WALLET_EVENT.WALLET_RESPONSE,
-                    id: requestData.id,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : "Extension communication failed",
-                };
-
-                window.postMessage(errorMessage, "*");
-            }
-        }
-    });
-
-    // Listen for responses from background script
-    chrome.runtime.onMessage.addListener(
-        (message: WalletEventMessage, _sender, _sendResponse) => {
-            // Forward wallet events to the page
-            if (
-                [
-                    WALLET_EVENT.WALLET_UNLOCKED,
-                    WALLET_EVENT.WALLET_LOCKED,
-                    WALLET_EVENT.CHAIN_CHANGED,
-                    WALLET_EVENT.ACCOUNTS_CHANGED,
-                ].includes(message.type)
-            ) {
-                window.postMessage(message, "*");
-            }
-
-            // Don't send response to keep the message channel open
-            return false;
-        },
-    );
-
-})();
+});

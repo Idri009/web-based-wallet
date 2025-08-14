@@ -10,12 +10,12 @@
         "64": "images/logo.png",
         "128": "images/logo.png"
     },
+    "action": {
+        "default_popup": "index.html"
+    },
     "background": {
         "service_worker": "background.js",
         "type": "module"
-    },
-    "action": {
-        "default_popup": "index.html"
     },
     "permissions": [
         "storage",

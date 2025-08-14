@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm build:main && pnpm build:inject",
+    "build": "pnpm build:main && pnpm build:inject && pnpm build:background",
     "build:main": "vite build --config vite.config.ts",
     "build:inject": "vite build --config vite.config.inject.ts",
+    "build:background": "vite build --config vite.config.background.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
