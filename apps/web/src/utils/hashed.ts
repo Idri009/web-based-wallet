@@ -874,7 +874,7 @@ export class Hashed {
     // EmptyHashedState();
   }
 
-  public changeWalletPassword() {}
+  public changeWalletPassword() { }
 
   public generateKeyPair(): KeyPair | null {
     // const seed = this.mnemonicToSeed(this.mnemonic);

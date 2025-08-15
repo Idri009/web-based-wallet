@@ -8,4 +8,5 @@ export enum RPC_METHODS {
   ETH_SIGN_TYPED_DATA_V4 = "eth_signTypedData_v4",
   WALLET_SWITCH_ETHEREUM_CHAIN = "wallet_switchEthereumChain",
   WALLET_ADD_ETHEREUM_CHAIN = "wallet_addEthereumChain",
+  REQUEST_PERMISSIONS = 'wallet_requestPermissions',
 }
