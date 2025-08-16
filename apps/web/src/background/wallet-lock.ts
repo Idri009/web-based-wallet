@@ -1,4 +1,4 @@
-import { hashedStore } from "./background-state";
+import { hashedStore } from "./wallet-state";
 
 let isUnlocked = false;
 let unlockTimestamp: number | null = null;

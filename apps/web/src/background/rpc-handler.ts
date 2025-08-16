@@ -1,4 +1,4 @@
-import { hashedStore } from "./background-state";
+import { walletStore } from "./wallet-state";
 import { walletUnlocked } from "./wallet-lock";
 import { RPC_METHODS } from "../enums/rpc-methods-enum";
 
@@ -25,7 +25,7 @@ export async function handleWalletRequest(method: string, _params: any[]) {
 
 function requestAccounts(): string[] {
     if (!walletUnlocked()) throw new Error("Wallet locked");
-    const address = hashedStore.getState().hashed?.getSelectedAccount?.();
+    const address = walletStore.getState().hashed?.getSelectedAccount?.();
     if (!address) throw new Error("No accounts");
     //   return [address];
     return ["0x123456789abcdefghijklmnopqrstuvwxyz"]

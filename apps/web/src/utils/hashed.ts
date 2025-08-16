@@ -844,6 +844,11 @@ export class Hashed {
     }
   }
 
+  // to-do
+  public getChainId(): string {
+    return "0x1";
+  }
+
   public getSelectedNetwork(): Networks | null {
     return this.selectedNetwork;
   }
